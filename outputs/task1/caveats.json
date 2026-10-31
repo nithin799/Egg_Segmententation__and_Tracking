@@ -1,0 +1,11 @@
+{
+  "117": "override: base+multimask; rod crosses egg, white tray similar in tone",
+  "135": "boiling water; blurred, ambiguous boundary (base/large IoU 0.93)",
+  "145": "boiling water; blurred, ambiguous boundary (base/large IoU 0.88)",
+  "124": "boiling water; blurred, ambiguous boundary",
+  "78": "ash on shell; slightly bumpy right edge",
+  "10, 12, 13": "leaves occlude egg; masks exclude occluders (visible pixels only)",
+  "42": "white tray; rod crosses egg; mask may be partial",
+  "44": "backlit hand; dark egg edge, rough left boundary",
+  "11": "leaves/stem occlude egg; visible pixels only"
+}
