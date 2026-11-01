@@ -1,0 +1,2 @@
+trial,split,change,why,params,mean_iou,median_iou,mean_dice,precision,recall,inst_precision,inst_recall,count_mae
+T1,dev,Grayscale + Otsu + connected components,Simplest possible baseline,"{""min_area"": 2000}",0.3379,0.2383,0.453,0.3722,0.8677,0.1963,0.3909,1.3977
