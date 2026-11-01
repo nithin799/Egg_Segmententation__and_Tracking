@@ -82,7 +82,8 @@ def summarize(df):
 
 # ------------------------------------------------------------ segmentation
 def seg_candidates(rgb, n_levels=9, open_k=7, min_frac=0.012, max_frac=0.6,
-                   min_ell=0.88, min_solidity=0.92, area_bonus=0.5, max_eggs=3):
+                   min_ell=0.88, min_solidity=0.92, area_bonus=0.5, max_eggs=3,
+                   max_aspect=None):
     """Multi-threshold candidates verified by solidity and ellipse fit (T4)."""
     H, W = rgb.shape[:2]
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
@@ -116,6 +117,10 @@ def seg_candidates(rgb, n_levels=9, open_k=7, min_frac=0.012, max_frac=0.6,
                     s = iou(filled.astype(bool), ell.astype(bool))
                     if s < min_ell:
                         continue
+                    if max_aspect is not None:
+                        (_, _), (rw, rh), _ = cv2.minAreaRect(c)
+                        if max(rw, rh) / max(min(rw, rh), 1) > max_aspect:
+                            continue
                     cands.append((s + area_bonus * area / (H * W), (y - pad, x - pad), filled))
     cands.sort(key=lambda c: -c[0])
     keep = []
@@ -219,3 +224,13 @@ def save_instance_map(masks, shape, path):
 def load_split(path="outputs/split.json"):
     s = json.load(open(path))
     return s["dev"], s["eval"]
+
+V2 = dict(max_frac=0.40, max_aspect=2.5)
+
+
+def segment_eggs_v2(rgb):
+    """v2 = T9b + physical size cap (0.40 of image) and aspect cap (2.5)."""
+    out = seg_candidates(rgb, **{**P4, "max_frac": V2["max_frac"]}, max_aspect=V2["max_aspect"])
+    if not out:
+        out = seg_candidates(rgb, **{**FALLBACK, "max_frac": V2["max_frac"]}, max_aspect=V2["max_aspect"])
+    return [fill_small_holes(complete_ellipse(refine_grabcut(rgb, m))) for m in out]
