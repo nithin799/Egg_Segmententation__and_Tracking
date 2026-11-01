@@ -127,13 +127,6 @@ Outputs generated:
 * Tracked video: `outputs/task4/tracked_egg_experiment.mp4`
 * 4-panel trajectory montage: `report/figs/task4_tracking_preview.png`
 
-### 4. Re-Generate the PDF Report
-To re-compile the 5-page submission report directly from the source images and tables:
-```bash
-python src/generate_pdf_report.py
-```
-Output compiled at: `report/Egg_Segmentation_and_Tracking_Report.pdf`.
-
 ---
 
 ## 📁 Repository Structure
@@ -145,8 +138,7 @@ Output compiled at: `report/Egg_Segmentation_and_Tracking_Report.pdf`.
 ├── src/
 │   ├── egg_seg.py                    # Classical segmentation algorithms (T9b, V1, V2)
 │   ├── run_task.py                   # Benchmark CLI and evaluation harness
-│   ├── track_video.py                # Real-time multi-object video tracker (Task 4)
-│   └── generate_pdf_report.py        # Automated 5-page PDF report compiler
+│   └── track_video.py                # Real-time multi-object video tracker (Task 4)
 ├── outputs/
 │   ├── split.json                    # Perceptual hash leak-free 4:1 Dev/Eval split
 │   ├── task1/                        # Pseudo-GT masks, visual overlays, caveats.json
@@ -157,8 +149,7 @@ Output compiled at: `report/Egg_Segmentation_and_Tracking_Report.pdf`.
 │   ├── Egg_Segmentation_and_Tracking_Report.pdf  # 5-page publication-quality technical report
 │   ├── FINAL_REPORT.md               # Complete narrative technical report
 │   ├── experiment_log.md             # Detailed engineering trial log (T1 to V2)
-│   ├── figs/                         # Publication-grade figures (overview, failures, tracking)
-│   └── pages_humanized/              # High-resolution rasterized report pages
+│   └── figs/                         # Publication-grade figures (overview, failures, tracking)
 ├── requirements.txt                  # Python dependencies
 └── README.md                         # Project documentation and reproduction guide
 ```
