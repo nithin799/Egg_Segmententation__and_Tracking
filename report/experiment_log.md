@@ -66,6 +66,17 @@ Conclusion: T9b parameters are at a plateau. Only min_ell matters (loosening it 
 Eval was run once, after the algorithm and parameters were locked. Eval is small (22 images), so differences from dev of a few points are within noise.
 
 
+### Failure analysis (final algorithm, 110 images, IoU vs Task 1 masks)
+Outcomes: 69 good (IoU >= 0.5), 27 partial, 14 near-zero. Scores are bimodal: eggs are either found well or not at all.
+
+1. Low egg-background contrast is the dominant cause. Spearman(IoU, contrast) = 0.66; mean IoU is 0.29 / 0.63 / 0.76 in the low / mid / high contrast thirds; 12 of 14 near-zero images are in the low third, none in the high third. (Contrast is a coarse proxy: ring statistics include dark walls near white bags.)
+2. Oversized regions (18 images). The prediction is a bag, tray or wall many times larger than an egg (median 64% of the image) with the egg inside it: recall high, precision near zero. The algorithm has no size limit tighter than 60% of the image although the largest egg is 36%.
+3. Wrong object (10 images). Thin elongated shapes such as a rod pass the ellipse test (median aspect ratio 3.1 vs 1.5 for good results). There is no aspect-ratio limit.
+4. Partial eggs (10 images). A threshold isolates only the lit part of an egg (shadow or foil); ellipse completion did not recover it.
+5. The relaxed fallback is the weakest component: 27 images, mean IoU 0.23, 22% good, but it still beats predicting nothing.
+Ground-truth caveat: Task 1 masks are SAM outputs. Excluding 11 uncertain images changes mean IoU only from 0.557 to 0.563, so reference noise does not explain the gap.
+Proposed fixes: absolute size limit, aspect-ratio limit, ellipse-from-arcs for partial eggs.
+
 ### T1 details
 - Full dev metrics: median IoU 0.238, pixel precision 0.372, pixel recall 0.868, instance precision 0.196, instance recall 0.391, count MAE 1.40.
 - Pattern: high recall, very low precision. A single global brightness threshold assumes the egg is the only bright object.
