@@ -93,8 +93,8 @@ All algorithms evaluated against the **Task 1 SAM ViT-Base reference masks** acr
 Clone the repository and install required packages in a clean Python virtual environment:
 ```bash
 # Clone the repository
-git clone https://github.com/<YOUR_USERNAME>/egg-segmentation-tracking.git
-cd egg-segmentation-tracking
+git clone https://github.com/nithin799/Egg_Segmententation__and_Tracking.git
+cd Egg_Segmententation__and_Tracking
 
 # Create and activate virtual environment
 python -m venv venv
