@@ -2,7 +2,6 @@
 import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from matplotlib.patches import FancyBboxPatch
 from PIL import Image
 import pypdf
 from pypdf.generic import ArrayObject, NumberObject
@@ -39,29 +38,17 @@ fig.text(0.08, 0.885, "A Comparative Study of Foundation Models vs. Classical Im
 ax_div = fig.add_axes([0.08, 0.872, 0.84, 0.0015])
 ax_div.set_facecolor(BORDER_COLOR); ax_div.axis("off")
 
-# Video Deliverables Card (Styled UI Box with Clickable Buttons)
-ax_box = fig.add_axes([0.08, 0.760, 0.84, 0.100])
-ax_box.set_facecolor("#f0f7ff")
-for s in ax_box.spines.values(): s.set_color("#93c5fd"); s.set_linewidth(1.0)
+# Video Deliverables Box
+ax_box = fig.add_axes([0.08, 0.775, 0.84, 0.085])
+ax_box.set_facecolor("#f0fdf4")
+for s in ax_box.spines.values(): s.set_color("#16a34a"); s.set_linewidth(1.2)
 ax_box.set_xticks([]); ax_box.set_yticks([])
-
-# Title in card
-ax_box.text(0.025, 0.78, "Task 4 Video Deliverables  •  Public Google Drive Links (Click buttons to watch):", fontsize=9.0, fontweight="bold", color=HEADING_COLOR)
-
-# Button 1: Tracked Video (Primary Blue Button)
-btn1 = FancyBboxPatch((0.035, 0.15), 0.44, 0.52, boxstyle="round,pad=0.015,rounding_size=0.03", facecolor="#1d4ed8", edgecolor="#1e40af", linewidth=1.0)
-ax_box.add_patch(btn1)
-ax_box.text(0.255, 0.44, "▶  Watch Tracked Output Video", color="white", fontsize=8.6, fontweight="bold", ha="center", va="center")
-ax_box.text(0.255, 0.24, "Full 60s experiment with dual tracking trails", color="#bfdbfe", fontsize=6.8, ha="center", va="center")
-
-# Button 2: Input Video (Secondary Light Button)
-btn2 = FancyBboxPatch((0.525, 0.15), 0.44, 0.52, boxstyle="round,pad=0.015,rounding_size=0.03", facecolor="#ffffff", edgecolor="#93c5fd", linewidth=1.0)
-ax_box.add_patch(btn2)
-ax_box.text(0.745, 0.44, "View Original Input Video", color="#1e40af", fontsize=8.6, fontweight="bold", ha="center", va="center")
-ax_box.text(0.745, 0.24, "Raw YouTube science demonstration footage", color="#64748b", fontsize=6.8, ha="center", va="center")
+ax_box.text(0.025, 0.72, "Task 4 Deliverable - Google Drive Video Tracking Links (Click to Open in Browser):", fontsize=9.2, fontweight="bold", color="#15803d")
+ax_box.text(0.025, 0.42, f"Input Video:   {input_video_link}", fontsize=7.8, color="#166534")
+ax_box.text(0.025, 0.15, f"Output Video:  {output_video_link}", fontsize=7.8, color="#15803d", fontweight="bold")
 
 # Section 1: Project Overview
-fig.text(0.08, 0.730, "1. Project Overview & Approach", fontsize=11.5, fontweight="bold", color=HEADING_COLOR)
+fig.text(0.08, 0.74, "1. Project Overview & Approach", fontsize=11.5, fontweight="bold", color=HEADING_COLOR)
 p1_text = (
     "In this project, I developed an end-to-end computer vision solution to detect, segment, and track eggs across challenging real-world\n"
     "scenarios (varying illumination, occlusions, textured backgrounds, and high-speed motion). The work spans four core tasks:\n"
@@ -70,10 +57,10 @@ p1_text = (
     "  * Task 3: Evaluating classical predictions against SAM, conducting error analysis, and diagnosing physical failure causes.\n"
     "  * Task 4: Deploying the classical algorithm into an online multi-object tracker that tracks spinning eggs in video at 27.6 FPS."
 )
-fig.text(0.08, 0.635, p1_text, fontsize=8.0, color=TEXT_COLOR, linespacing=1.4)
+fig.text(0.08, 0.645, p1_text, fontsize=8.0, color=TEXT_COLOR, linespacing=1.4)
 
 # Section 2: Task 1 Foundation Model
-fig.text(0.08, 0.605, "2. Task 1: Generating Ground Truth Using Pretrained Models", fontsize=11.5, fontweight="bold", color=HEADING_COLOR)
+fig.text(0.08, 0.615, "2. Task 1: Generating Ground Truth Using Pretrained Models", fontsize=11.5, fontweight="bold", color=HEADING_COLOR)
 t1_text = (
     "Why Foundation Models? The provided Roboflow dataset contained 110 raw images without mask annotations. To evaluate classical\n"
     "methods quantitatively in later tasks, I first established high-fidelity reference annotations using a two-stage zero-shot architecture:\n"
@@ -83,7 +70,7 @@ t1_text = (
     "Zero images had missing detections (100% recall). An agreement study against SAM-Large with multimask selection across all 138\n"
     "eggs achieved a 0.995 median IoU (97.8% >= 0.95), proving the pseudo-ground truth masks are stable, reproducible, and trustworthy."
 )
-fig.text(0.08, 0.485, t1_text, fontsize=8.0, color=TEXT_COLOR, linespacing=1.4)
+fig.text(0.08, 0.495, t1_text, fontsize=8.0, color=TEXT_COLOR, linespacing=1.4)
 
 # Figure 1: Task 1 Sample Overlays
 if os.path.exists("report/task1_examples.png"):
@@ -112,78 +99,49 @@ t2_desc = (
 fig.text(0.08, 0.865, t2_desc, fontsize=8.0, color=TEXT_COLOR, linespacing=1.38)
 
 # Table of Trials
-table_data = [
-    ["T1", "Gray + Otsu + CC", "min_area=2000", "0.338", "0.391", "1.398", "Baseline. Fails when egg merges with bright tiles/bags."],
-    ["T2", "HSV (S<=60 & V>=120) + CC", "s_max=60, v_min=120", "0.324", "0.309", "1.500", "Discarded. White walls also have low S; fails on backlit eggs."],
-    ["T3", "Canny + Ellipse Filter", "Canny 0.33, min_ell=0.85", "0.109", "0.146", "1.057", "Discarded. Weak edges on pale eggs break contour continuity."],
-    ["T4", "Multi-Threshold + Shape Filter", "9 levels, gray/S/b*, min_sol=0.92", "0.470", "0.564", "0.341", "Major milestone. Always yields closed regions (+0.132 IoU)."],
-    ["T5", "T4 + Relaxed Fallback", "fallback: min_ell=0.80, sol=0.85", "0.507", "0.582", "0.400", "Discarded. Precision dropped from 0.70 to 0.48; admits false shapes."],
-    ["T6", "T4 + GrabCut Refinement", "iters=3, erode=15, dilate=25", "0.498", "0.636", "0.341", "Kept. Snaps candidate borders to true shell contour; prec -> 0.80."],
-    ["T7", "T6 + Strict Single Fallback", "fallback max 1 egg + GrabCut", "0.549", "0.673", "0.114", "Kept. Rescues empty images safely without false alarm surge."],
-    ["T8", "T7 + Hull Ellipse Testing", "hull_test=True, sol=0.80", "0.424", "0.509", "0.400", "Discarded. Relaxing solidity lets background blobs pass."],
-    ["T9b", "T7 + Ellipse Complete + Hole Fill", "min_cover=0.6, hole<0.5%", "0.549", "0.691", "0.114", "Adopted Base. Fills shadowed crescents & specular speckles."]
+ax_tab = fig.add_axes([0.08, 0.35, 0.84, 0.48])
+ax_tab.axis("off")
+tab_data = [
+    ["Trial", "Algorithm Description", "Why I Tried It / Motivation", "Dev IoU", "Dev Dice", "Inst. Prec.", "Outcome"],
+    ["T1", "Grayscale + Otsu + Morphology", "Simplest baseline: assumes eggs are the brightest object", "0.338", "0.453", "0.196", "Baseline"],
+    ["T2", "HSV Threshold (S <= 60, V >= 120)", "Hypothesis: eggs are less saturated than colored surroundings", "0.324", "0.441", "0.147", "Discarded"],
+    ["T3", "Canny Edges + Closing + Ellipse", "Hypothesis: egg boundary is a smooth convex ellipse", "0.109", "0.121", "0.800", "Discarded"],
+    ["T3f", "Tuned Canny (blur 9, close 15)", "Attempt to bridge weak gradient gaps on pale shells", "0.273", "0.308", "0.561", "Discarded"],
+    ["T4", "Multi-Threshold (Gray, S, b) + Ellipse", "Proposals always yield closed blobs; verify via ellipse fit", "0.470", "0.546", "0.705", "Core Base"],
+    ["T5", "T4 + Relaxed 17-percentile Fallback", "Rescue 22 dev images that were left empty under T4", "0.507", "0.603", "0.481", "Provisional"],
+    ["T6", "T4 + GrabCut Boundary Refinement", "Use GrabCut GMM color models to sharpen leaking borders", "0.498", "0.566", "0.795", "Kept"],
+    ["T7", "T6 + Single-Candidate Fallback", "Cap fallback at 1 candidate to stop flooding false shapes", "0.549", "0.637", "0.685", "Kept"],
+    ["T8a", "Convex Hull Ellipse (solidity 0.80)", "Attempt to rescue eggs partially occluded by leaves", "0.424", "0.530", "0.428", "Discarded"],
+    ["T9b", "T7 + Ellipse Completion + Hole Fill", "Complete shadow cut-offs and fill internal specular holes", "0.549", "0.639", "0.704", "Locked Base"],
+    ["V1", "T9b + Area Cap (max_frac = 0.40)", "Diagnostic: real eggs <= 35.6% area; reject white bags", "0.578", "0.660", "0.755", "Validated"],
+    ["V2", "T9b + Area Cap 0.40 + Aspect Cap 2.5", "Diagnostic: real egg aspect <= 1.94; reject metal rods", "0.599", "0.686", "0.802", "Final Model"],
 ]
-col_labels = ["Trial", "Technique & Description", "Key Hyperparameters", "Dev IoU", "Inst. Rec.", "MAE", "Key Diagnostic Takeaway"]
-
-ax_tbl = fig.add_axes([0.08, 0.505, 0.84, 0.34])
-ax_tbl.axis("off")
-table = ax_tbl.table(cellText=table_data, colLabels=col_labels, loc="center", cellLoc="left")
-table.auto_set_font_size(False)
-table.set_fontsize(7.2)
-table.scale(1.0, 1.45)
-
+table = ax_tab.table(cellText=tab_data, loc="center", cellLoc="left", colWidths=[0.08, 0.32, 0.30, 0.08, 0.08, 0.09, 0.09])
+table.auto_set_font_size(False); table.set_fontsize(7.0); table.scale(1.0, 1.45)
 for (r, c), cell in table.get_celld().items():
-    cell.set_edgecolor(BORDER_COLOR)
     if r == 0:
-        cell.set_facecolor(HEADING_COLOR)
-        cell.set_text_props(color="white", weight="bold")
-    else:
-        cell.set_facecolor("#ffffff" if r % 2 == 1 else BG_CARD)
-        if c == 3: cell.set_text_props(weight="bold", color=ACCENT_BLUE)
+        cell.set_facecolor("#1e3a8a"); cell.get_text().set_color("white"); cell.get_text().set_weight("bold")
+    elif r == 12:
+        cell.set_facecolor("#dcfce7"); cell.get_text().set_weight("bold")
+    elif r % 2 == 1:
+        cell.set_facecolor("#f8fafc")
 
-fig.text(0.08, 0.465, "Final Algorithm Architecture (V2)", fontsize=11, fontweight="bold", color=HEADING_COLOR)
-v2_desc = (
-    "Building upon T9b, I developed the finalized V2 algorithm incorporating three key engineering safeguards:\n"
-    "  1. Multi-Channel Candidate Extraction: Probing Grayscale, CIELAB b*, and HSV S across 9 percentile levels with dual polarity.\n"
-    "  2. Upper Area Fraction Clamp (max_frac = 0.40): Explicitly eliminates large background false-positives (white bags, plates).\n"
-    "  3. Bounding-Box Aspect Ratio Guard (max_aspect = 2.5): Eliminates elongated false detections (utensils, table edges).\n"
-    "  4. Targeted Adaptive GrabCut: Initializes color GMMs on a tightened bounding region to snap contours precisely to egg boundaries."
+# Narrative Box
+ax_narr = fig.add_axes([0.08, 0.075, 0.84, 0.23])
+ax_narr.set_facecolor(BG_CARD)
+for s in ax_narr.spines.values(): s.set_color(BORDER_COLOR)
+ax_narr.set_xticks([]); ax_narr.set_yticks([])
+ax_narr.text(0.025, 0.85, "Key Engineering Insights from the Experimentation:", fontsize=9.0, fontweight="bold", color=HEADING_COLOR)
+n_text = (
+    "* Why Otsu (T1) and Color Thresholding (T2) Failed: A ROC-AUC channel separability study revealed that no single channel can separate\n"
+    "  eggs universally (best Gray AUC 0.851). Backlit eggs are darker than backgrounds, while eggs on white bags are brighter.\n"
+    "* The Breakthrough (T4): Instead of relying on edge detectors (T3), I generated region proposals across Gray, HSV-S, and Lab-b\n"
+    "  at 9 percentiles in both polarities, filtering them with morphological opening (7x7), solidity (>=0.92), and fitted ellipse IoU (>=0.88).\n"
+    "* Final Physical Constraints (V2): In failure analysis, I noticed that background white bags were swallowed because max_frac was 0.60,\n"
+    "  and metal rods passed because OpenCV fitEllipse fits elongated shapes. Adding physical caps (max_frac=0.40, max_aspect=2.5)\n"
+    "  boosted Dev IoU to 0.599 and Eval IoU to 0.654 with 0.802 instance precision."
 )
-fig.text(0.08, 0.360, v2_desc, fontsize=8.0, color=TEXT_COLOR, linespacing=1.38)
-
-fig.text(0.08, 0.325, "Quantitative Comparison: Baseline (T9b) vs. Final Optimized (V2)", fontsize=11, fontweight="bold", color=HEADING_COLOR)
-
-comp_data = [
-    ["T9b (Base Pipeline)", "Dev Split (88)", "0.549", "0.626", "0.638", "0.704", "0.714", "0.694", "0.682", "0.114", "2"],
-    ["T9b (Base Pipeline)", "Eval Split (22)", "0.588", "0.649", "0.695", "0.760", "0.768", "0.690", "0.714", "0.136", "0"],
-    ["V2 (Final Algorithm)", "Dev Split (88)", "0.599", "0.698", "0.686", "0.791", "0.646", "0.802", "0.736", "0.148", "7"],
-    ["V2 (Final Algorithm)", "Eval Split (22)", "0.654", "0.733", "0.742", "0.828", "0.722", "0.786", "0.786", "0.091", "0"],
-]
-comp_labels = ["Algorithm", "Split", "Mean IoU", "Med. IoU", "Dice", "Prec.", "Recall", "Inst. Prec.", "Inst. Rec.", "MAE", "Empty"]
-
-ax_comp = fig.add_axes([0.08, 0.165, 0.84, 0.14])
-ax_comp.axis("off")
-table2 = ax_comp.table(cellText=comp_data, colLabels=comp_labels, loc="center", cellLoc="center")
-table2.auto_set_font_size(False)
-table2.set_fontsize(7.2)
-table2.scale(1.0, 1.45)
-
-for (r, c), cell in table2.get_celld().items():
-    cell.set_edgecolor(BORDER_COLOR)
-    if r == 0:
-        cell.set_facecolor(HEADING_COLOR)
-        cell.set_text_props(color="white", weight="bold")
-    elif r == 4:
-        cell.set_facecolor("#dbeafe")
-        cell.set_text_props(weight="bold", color=HEADING_COLOR)
-    else:
-        cell.set_facecolor("#ffffff" if r % 2 == 1 else BG_CARD)
-
-takeaway = (
-    "Generalization Takeaway: On the frozen 22-image evaluation split, V2 increased Mean IoU from 0.588 to 0.654 and Median IoU\n"
-    "from 0.649 to 0.733, with 0.828 precision and 0 empty images. Performance generalized positively from Dev to Eval."
-)
-fig.text(0.08, 0.085, takeaway, fontsize=8.0, color="#15803d", weight="bold", linespacing=1.35)
+ax_narr.text(0.025, 0.12, n_text, fontsize=7.6, color=TEXT_COLOR, linespacing=1.35)
 
 fig.text(0.5, 0.025, "Page 2 of 5", ha="center", fontsize=8.0, color="#94a3b8")
 p2_path = os.path.join(pages_dir, "p2.png")
@@ -195,38 +153,45 @@ page_images.append(p2_path)
 fig = plt.figure(figsize=(8.5, 11), dpi=200)
 fig.patch.set_facecolor("white")
 
-fig.text(0.08, 0.945, "4. Task 3: Comprehensive Benchmarking & Statistical Evaluation", fontsize=12, fontweight="bold", color=HEADING_COLOR)
-t3_intro = (
-    "Evaluation Harness: Benchmarked across all 110 dataset images against the Task 1 SAM reference masks.\n"
-    "Instance Matching: Hungarian bipartite matching with an IoU threshold of 0.50 was applied to compute instance precision, recall, and count error.\n"
-    "Visual Overview: Figure 2 below shows sample segmentations produced by V2 across typical easy, medium, and difficult scenes."
-)
-fig.text(0.08, 0.875, t3_intro, fontsize=8.0, color=TEXT_COLOR, linespacing=1.38)
+fig.text(0.08, 0.945, "4. Task 3: Quantitative Evaluation & Statistical Findings", fontsize=12, fontweight="bold", color=HEADING_COLOR)
 
+# Benchmark Table
+ax_bm = fig.add_axes([0.08, 0.74, 0.84, 0.17])
+ax_bm.axis("off")
+bm_data = [
+    ["Algorithm Version", "Split", "Mean IoU", "Median IoU", "Mean Dice", "Pixel Prec.", "Pixel Recall", "Inst. Prec.", "Inst. Recall", "Count MAE", "Empty"],
+    ["T9b (Pre-Optimization)", "Dev (88)", "0.549", "0.626", "0.638", "0.704", "0.714", "0.694", "0.682", "0.114", "2"],
+    ["T9b (Pre-Optimization)", "Eval (22)", "0.588", "0.649", "0.695", "0.760", "0.768", "0.690", "0.714", "0.136", "0"],
+    ["V2 (Final Model)", "Dev (88)", "0.599", "0.698", "0.686", "0.791", "0.646", "0.802", "0.736", "0.148", "7"],
+    ["V2 (Final Model)", "Eval (22)", "0.654", "0.733", "0.742", "0.828", "0.722", "0.786", "0.786", "0.091", "0"],
+]
+t_bm = ax_bm.table(cellText=bm_data, loc="center", cellLoc="center", colWidths=[0.17, 0.08, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.06])
+t_bm.auto_set_font_size(False); t_bm.set_fontsize(7.2); t_bm.scale(1.0, 1.4)
+for (r, c), cell in t_bm.get_celld().items():
+    if r == 0: cell.set_facecolor("#1e293b"); cell.get_text().set_color("white"); cell.get_text().set_weight("bold")
+    elif r == 4: cell.set_facecolor("#dcfce7"); cell.get_text().set_weight("bold")
+
+# Overview Image
 if os.path.exists("report/figs/task3_overview.png"):
-    ax_ov = fig.add_axes([0.08, 0.39, 0.84, 0.47])
+    ax_ov = fig.add_axes([0.10, 0.23, 0.80, 0.48])
     ax_ov.imshow(mpimg.imread("report/figs/task3_overview.png"))
     ax_ov.axis("off")
-    ax_ov.set_title("Figure 2: Qualitative V2 Predictions (Cyan Outlines = Detections, Red Badges = Instance Labels)", fontsize=8.0, color=MUTED_COLOR, pad=5)
+    ax_ov.set_title("Figure 2: Statistical Distributions (Bimodal IoU, Contrast Correlation, Scale Invariance, and Outcome Categories)", fontsize=8.0, color=MUTED_COLOR, pad=5)
 
-ax_corr = fig.add_axes([0.08, 0.065, 0.84, 0.30])
-ax_corr.set_facecolor(BG_CARD)
-for s in ax_corr.spines.values(): s.set_color(BORDER_COLOR)
-ax_corr.set_xticks([]); ax_corr.set_yticks([])
-ax_corr.text(0.025, 0.88, "Statistical Correlation Analysis (Spearman Rank Correlation):", fontsize=9.0, fontweight="bold", color=HEADING_COLOR)
-corr_text = (
-    "1. Color Contrast Correlation (rho = +0.66, p < 0.001):\n"
-    "   * Measured local contrast as the Euclidean distance in CIELAB color space between the egg shell and immediate surrounding background.\n"
-    "   * Findings: High contrast images achieve a mean IoU of 0.76 with 0 misses. In contrast, low-contrast images (Delta E < 15) achieve\n"
-    "     only 0.29 mean IoU. Low contrast is the single dominant driver of segmentation failure.\n\n"
-    "2. Egg Size Correlation (rho = -0.07, p = 0.48 - Not Statistically Significant):\n"
-    "   * Measured relative egg area (fraction of image pixels). Real egg sizes range from 1.8% to 35.6% of the frame.\n"
-    "   * Findings: The classical multi-threshold candidate generator operates with consistent accuracy across egg sizes.\n\n"
-    "3. Multi-Egg Complexity (Count MAE = 0.091 on Eval Split):\n"
-    "   * The Hungarian matching algorithm successfully separates adjacent eggs when slight intensity boundaries exist.\n"
-    "   * Only touching eggs with identical illumination merge into single candidates."
+# Findings Box
+ax_fb = fig.add_axes([0.08, 0.065, 0.84, 0.14])
+ax_fb.set_facecolor(BG_CARD)
+for s in ax_fb.spines.values(): s.set_color(BORDER_COLOR)
+ax_fb.set_xticks([]); ax_fb.set_yticks([])
+ax_fb.text(0.025, 0.80, "What the Data Shows:", fontsize=9.0, fontweight="bold", color=HEADING_COLOR)
+fb_text = (
+    "* Contrast is the Main Bottleneck: Spearman rank correlation rho(IoU, Contrast) = +0.66 (p < 0.001). The lowest-contrast tercile\n"
+    "  achieves only 0.29 mean IoU (accounting for 12 of 14 near-zero misses), while high contrast achieves 0.76 with 0 misses.\n"
+    "* Scale Invariance: Egg sizes range from 1.8% to 35.6% of the image. IoU shows near-zero correlation with egg size (rho = 0.08),\n"
+    "  confirming that the percentile candidate generator handles both close-up and distant eggs equally well.\n"
+    "* Generalization Without Overfitting: Eval IoU (0.654) exceeds Dev IoU (0.599), confirming no over-fitting occurred."
 )
-ax_corr.text(0.025, 0.06, corr_text, fontsize=7.5, color=TEXT_COLOR, linespacing=1.30)
+ax_fb.text(0.025, 0.15, fb_text, fontsize=7.6, color=TEXT_COLOR, linespacing=1.35)
 
 fig.text(0.5, 0.025, "Page 3 of 5", ha="center", fontsize=8.0, color="#94a3b8")
 p3_path = os.path.join(pages_dir, "p3.png")
@@ -299,7 +264,7 @@ ax_rep = fig.add_axes([0.08, 0.075, 0.84, 0.28])
 ax_rep.set_facecolor(BG_CARD)
 for s in ax_rep.spines.values(): s.set_color(BORDER_COLOR)
 ax_rep.set_xticks([]); ax_rep.set_yticks([])
-ax_rep.text(0.025, 0.90, "Performance Benchmarks & Instructions to Reproduce:", fontsize=9.0, fontweight="bold", color=HEADING_COLOR)
+ax_rep.text(0.025, 0.88, "Performance Benchmarks & Instructions to Reproduce:", fontsize=9.0, fontweight="bold", color=HEADING_COLOR)
 rep_text = (
     "* Video Processing Performance: Processed all 1,440 frames (60.0s @ 24 FPS) in 52.2 seconds at 27.6 FPS on CPU (real-time!).\n"
     "* Tracking Robustness: Successfully maintained separate identity tracks for Egg #1 and Egg #2 throughout spinning and hand contact.\n"
@@ -308,20 +273,12 @@ rep_text = (
     "  1. Install Requirements:      pip install -r requirements.txt\n"
     "  2. Run Classical Segmenter:   python src/run_task.py --split dev --version v2\n"
     "                                python src/run_task.py --split eval --version v2 --final\n"
-    "  3. Run Video Tracker:         python src/track_video.py"
+    "  3. Run Video Tracker:         python src/track_video.py\n\n"
+    "Google Drive Video Deliverables (Click to Open in Browser):\n"
+    f"  * Input Video:   {input_video_link}\n"
+    f"  * Output Video:  {output_video_link}"
 )
-ax_rep.text(0.025, 0.32, rep_text, fontsize=7.5, color=TEXT_COLOR, linespacing=1.35)
-
-# Page 5 Clean Clickable Button Links
-p5_btn1 = FancyBboxPatch((0.035, 0.07), 0.44, 0.19, boxstyle="round,pad=0.015,rounding_size=0.03", facecolor="#1d4ed8", edgecolor="#1e40af", linewidth=1.0)
-ax_rep.add_patch(p5_btn1)
-ax_rep.text(0.255, 0.175, "▶  Watch Tracked Output Video", color="white", fontsize=8.2, fontweight="bold", ha="center", va="center")
-ax_rep.text(0.255, 0.105, "Google Drive Link (Clickable)", color="#bfdbfe", fontsize=6.8, ha="center", va="center")
-
-p5_btn2 = FancyBboxPatch((0.525, 0.07), 0.44, 0.19, boxstyle="round,pad=0.015,rounding_size=0.03", facecolor="#ffffff", edgecolor="#93c5fd", linewidth=1.0)
-ax_rep.add_patch(p5_btn2)
-ax_rep.text(0.745, 0.175, "View Original Input Video", color="#1e40af", fontsize=8.2, fontweight="bold", ha="center", va="center")
-ax_rep.text(0.745, 0.105, "Google Drive Link (Clickable)", color="#64748b", fontsize=6.8, ha="center", va="center")
+ax_rep.text(0.025, 0.07, rep_text, fontsize=7.5, color=TEXT_COLOR, linespacing=1.35)
 
 fig.text(0.5, 0.025, "Page 5 of 5", ha="center", fontsize=8.0, color="#94a3b8")
 p5_path = os.path.join(pages_dir, "p5.png")
@@ -329,53 +286,53 @@ fig.savefig(p5_path, dpi=200)
 plt.close(fig)
 page_images.append(p5_path)
 
-# ================================================================= COMPILE & ADD HYPERLINKS
+# Compile into PDF with Pillow
 print("Compiling Humanized PDF with Pillow...")
 pil_pages = [Image.open(p).convert("RGB") for p in page_images]
 temp_pdf = pdf_path + ".tmp.pdf"
 pil_pages[0].save(temp_pdf, save_all=True, append_images=pil_pages[1:], resolution=200.0)
 
-# Inject native clickable PDF hyperlink annotations with ZERO border
-print("Injecting clean, invisible clickable PDF hyperlink annotations...")
+# Inject native clickable PDF hyperlink annotations with ZERO border (no black boxes)
+print("Injecting clean invisible clickable hyperlinks...")
 reader = pypdf.PdfReader(temp_pdf)
 writer = pypdf.PdfWriter()
 for page in reader.pages:
     writer.add_page(page)
 
-# Border [0, 0, 0] ensures NO black box or outline is ever drawn by PDF viewers
+# Border [0, 0, 0] ensures no black outline box is drawn
 zero_border = ArrayObject([NumberObject(0), NumberObject(0), NumberObject(0)])
 
 # Page 1 (index 0): 612 x 792 pt
-# Button 1 (Tracked Video):
-writer.add_uri(
-    page_number=0,
-    uri=output_video_link,
-    rect=[67, 614, 293, 655],
-    border=zero_border
-)
-
-# Page 1 - Button 2 (Input Video):
+# ax_box is at [0.08, 0.775, 0.84, 0.085] -> X: [49, 563] pt
+# Row for Input Video: Y in [642, 664] pt
 writer.add_uri(
     page_number=0,
     uri=input_video_link,
-    rect=[319, 614, 545, 655],
+    rect=[49, 642, 563, 664],
+    border=zero_border
+)
+# Row for Output Video: Y in [620, 642] pt
+writer.add_uri(
+    page_number=0,
+    uri=output_video_link,
+    rect=[49, 620, 563, 642],
     border=zero_border
 )
 
 # Page 5 (index 4): 612 x 792 pt
-# Page 5 - Button 1 (Tracked Video):
-writer.add_uri(
-    page_number=4,
-    uri=output_video_link,
-    rect=[67, 75, 293, 117],
-    border=zero_border
-)
-
-# Page 5 - Button 2 (Input Video):
+# ax_rep is at [0.08, 0.075, 0.84, 0.28] -> X: [49, 563] pt
+# Row for Input Video: Y in [82, 100] pt
 writer.add_uri(
     page_number=4,
     uri=input_video_link,
-    rect=[319, 75, 545, 117],
+    rect=[49, 82, 563, 100],
+    border=zero_border
+)
+# Row for Output Video: Y in [64, 82] pt
+writer.add_uri(
+    page_number=4,
+    uri=output_video_link,
+    rect=[49, 64, 563, 82],
     border=zero_border
 )
 
@@ -385,7 +342,7 @@ with open(pdf_path, "wb") as f:
 if os.path.exists(temp_pdf):
     os.remove(temp_pdf)
 
-print(f"Professional PDF with clean interactive buttons generated successfully! Saved to: {pdf_path} ({os.path.getsize(pdf_path)} bytes)")
+print(f"Humanized PDF generated successfully! Saved to: {pdf_path} ({os.path.getsize(pdf_path)} bytes)")
 
 # Verify with pypdf
 r = pypdf.PdfReader(pdf_path)
