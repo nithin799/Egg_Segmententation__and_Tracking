@@ -58,6 +58,13 @@ Conclusion: no single channel separates egg from background on most images; the 
 
 Conclusion: T9b parameters are at a plateau. Only min_ell matters (loosening it hurts). Parameters were tuned on dev only.
 
+## Final results (script `src/run_task.py`, GrabCut seeded)
+| Split | Mean IoU | Median IoU | Dice | Inst. prec. | Inst. recall | Count MAE | Empty |
+|---|---|---|---|---|---|---|---|
+| Dev (88) | 0.549 | 0.626 | 0.638 | 0.694 | 0.682 | 0.114 | 2 |
+| Eval (22) | 0.588 | 0.649 | 0.695 | 0.690 | 0.714 | 0.136 | 0 |
+Eval was run once, after the algorithm and parameters were locked. Eval is small (22 images), so differences from dev of a few points are within noise.
+
 
 ### T1 details
 - Full dev metrics: median IoU 0.238, pixel precision 0.372, pixel recall 0.868, instance precision 0.196, instance recall 0.391, count MAE 1.40.
