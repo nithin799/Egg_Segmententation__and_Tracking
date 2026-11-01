@@ -37,14 +37,14 @@ fig.text(0.08, 0.885, "A Comparative Study of Foundation Models vs. Classical Im
 ax_div = fig.add_axes([0.08, 0.872, 0.84, 0.0015])
 ax_div.set_facecolor(BORDER_COLOR); ax_div.axis("off")
 
-# Video Deliverables Box
+# Video Deliverables Box (Clickable Links)
 ax_box = fig.add_axes([0.08, 0.775, 0.84, 0.085])
 ax_box.set_facecolor("#f0fdf4")
 for s in ax_box.spines.values(): s.set_color("#16a34a"); s.set_linewidth(1.2)
 ax_box.set_xticks([]); ax_box.set_yticks([])
-ax_box.text(0.025, 0.72, "Task 4 Deliverable - Google Drive Video Tracking Links:", fontsize=9.5, fontweight="bold", color="#15803d")
-ax_box.text(0.025, 0.42, f"Input Video:  {input_video_link}", fontsize=8.0, color="#166534")
-ax_box.text(0.025, 0.15, f"Output Video: {output_video_link}", fontsize=8.0, color="#15803d", fontweight="bold")
+ax_box.text(0.025, 0.73, "Task 4 Deliverable - Google Drive Video Tracking Links [CLICKABLE IN PDF]:", fontsize=9.2, fontweight="bold", color="#15803d")
+ax_box.text(0.025, 0.44, f"Input Video:   {input_video_link}", fontsize=8.0, color="#166534", fontfamily="monospace")
+ax_box.text(0.025, 0.16, f"Output Video:  {output_video_link}", fontsize=8.0, color="#15803d", fontweight="bold", fontfamily="monospace")
 
 # Section 1: Project Overview
 fig.text(0.08, 0.74, "1. Project Overview & Approach", fontsize=11.5, fontweight="bold", color=HEADING_COLOR)
@@ -273,9 +273,9 @@ rep_text = (
     "  2. Run Classical Segmenter:   python src/run_task.py --split dev --version v2\n"
     "                                python src/run_task.py --split eval --version v2 --final\n"
     "  3. Run Video Tracker:         python src/track_video.py\n\n"
-    "Google Drive Video Deliverables:\n"
-    f"  * Input Video:  {input_video_link}\n"
-    f"  * Output Video: {output_video_link}"
+    "Google Drive Video Deliverables (Clickable Links):\n"
+    f"  * Input Video:   {input_video_link}\n"
+    f"  * Output Video:  {output_video_link}"
 )
 ax_rep.text(0.025, 0.07, rep_text, fontsize=7.5, color=TEXT_COLOR, linespacing=1.35)
 
@@ -288,9 +288,59 @@ page_images.append(p5_path)
 # Compile into PDF with Pillow
 print("Compiling Humanized PDF with Pillow...")
 pil_pages = [Image.open(p).convert("RGB") for p in page_images]
-pil_pages[0].save(pdf_path, save_all=True, append_images=pil_pages[1:], resolution=200.0)
-print(f"Humanized PDF generated successfully! Saved to: {pdf_path} ({os.path.getsize(pdf_path)} bytes)")
+temp_pdf = pdf_path + ".tmp.pdf"
+pil_pages[0].save(temp_pdf, save_all=True, append_images=pil_pages[1:], resolution=200.0)
+
+# Inject clickable PDF link annotations using pypdf
+print("Injecting native clickable PDF hyperlink annotations...")
+reader = pypdf.PdfReader(temp_pdf)
+writer = pypdf.PdfWriter()
+for page in reader.pages:
+    writer.add_page(page)
+
+# Page 1 (index 0): 612 x 792 pt
+# ax_box is [0.08*612, 0.775*792, 0.92*612, 0.86*792] -> [49, 614, 563, 681]
+# Row 1 (Input Video): Y in [647, 680]
+writer.add_uri(
+    page_number=0,
+    uri=input_video_link,
+    rect=[49, 647, 563, 680]
+)
+# Row 2 (Output Video): Y in [614, 647]
+writer.add_uri(
+    page_number=0,
+    uri=output_video_link,
+    rect=[49, 614, 563, 647]
+)
+
+# Page 5 (index 4): 612 x 792 pt
+# Links in bottom of ax_rep:
+writer.add_uri(
+    page_number=4,
+    uri=input_video_link,
+    rect=[49, 84, 563, 105]
+)
+writer.add_uri(
+    page_number=4,
+    uri=output_video_link,
+    rect=[49, 62, 563, 84]
+)
+
+with open(pdf_path, "wb") as f:
+    writer.write(f)
+
+if os.path.exists(temp_pdf):
+    os.remove(temp_pdf)
+
+print(f"Interactive PDF with native clickable hyperlinks generated successfully! Saved to: {pdf_path} ({os.path.getsize(pdf_path)} bytes)")
 
 # Verify with pypdf
 r = pypdf.PdfReader(pdf_path)
 print(f"Verified {len(r.pages)} pages in {pdf_path}!")
+for i, page in enumerate(r.pages):
+    annots = page.get('/Annots')
+    if annots:
+        print(f"Page {i+1} has {len(annots)} interactive link annotations:")
+        for a in annots:
+            obj = a.get_object()
+            print(f"  - {obj.get('/A').get('/URI')}")
