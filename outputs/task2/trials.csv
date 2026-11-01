@@ -1,2 +1,3 @@
 trial,split,change,why,params,mean_iou,median_iou,mean_dice,precision,recall,inst_precision,inst_recall,count_mae
 T1,dev,Grayscale + Otsu + connected components,Simplest possible baseline,"{""min_area"": 2000}",0.3379,0.2383,0.453,0.3722,0.8677,0.1963,0.3909,1.3977
+T2,dev,"HSV: low saturation and high value, then CC","T1 failed because brightness alone merges egg with bright background; eggs should be less saturated than skin, plastic and fabric","{""s_max"": 60, ""v_min"": 120, ""min_area"": 2000}",0.3242,0.246,0.4413,0.3414,0.8979,0.1466,0.3091,1.5
