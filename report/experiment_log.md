@@ -26,6 +26,11 @@
 | Trial | What changed | Why | Parameters | Dev mean IoU / Dice | Inst. recall | Kept? and why |
 |---|---|---|---|---|---|---|
 | T1 | Gray + Otsu + CC | baseline | min_area=2000 | 0.338 / 0.453 | 0.391 | Baseline. Recall 0.87 but precision 0.37. Egg merges with bright backgrounds (white bag, tile, lid) into one blob (125, 108, 127, 123, 42); on backlit hands the egg is darker than the background so it is missed (20, 44). Brightness alone cannot separate egg from background. |
+| T2 | HSV: S <= 60 and V >= 120, then CC | T1 failed on brightness; hypothesis: eggs are less saturated than skin, plastic, fabric | s_max=60, v_min=120, min_area=2000 | 0.324 / 0.441 | 0.309 | Discarded. Worse than T1 (inst. recall 0.39 to 0.31, count MAE 1.40 to 1.50); better on 47 images, worse on 41. White walls, bags and trays share the egg's low saturation and high value; backlit eggs (20, 44) fail V >= 120. Channel analysis showed S is a weaker cue (separability 0.775) than gray (0.851), so the hypothesis was wrong. |
+### Channel separability (dev, per-image AUC, polarity chosen per image, so optimistic)
+gray 0.851 | L 0.850 | V 0.837 | b 0.777 | S 0.775 | a 0.703. Images with AUC > 0.9: gray 34, L 34, V 31, b 19, S 19, a 5 (of 88).
+Conclusion: no single channel separates egg from background on most images; the egg is brighter than its background in some images and darker in others.
+| T3 | Canny + closing (5x5) + ellipse-fit contour filter | No channel separates egg from background (best AUC 0.85); eggs are the one consistent smooth-ellipse shape | sigma=0.33, close_k=5, min_frac=0.01, max_frac=0.5, min_ell=0.85 | 0.109 / 0.121 | 0.146 | Discarded as a standalone method: median IoU 0.0, most images get no prediction (pixel recall 0.11). Instance precision rose to 0.80, so the ellipse test is a good verifier. Likely cause: Canny edges around pale eggs are not closed. Idea kept: use the ellipse test to filter candidates from another method. |
 
 ### T1 details
 - Full dev metrics: median IoU 0.238, pixel precision 0.372, pixel recall 0.868, instance precision 0.196, instance recall 0.391, count MAE 1.40.
